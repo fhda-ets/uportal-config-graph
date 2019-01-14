@@ -1,0 +1,156 @@
+package edu.fhda.uportal.confgraph.web;
+
+import edu.fhda.uportal.confgraph.SpelServices;
+import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigJpaEntity;
+import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigRepository;
+import edu.fhda.uportal.confgraph.util.DeepAppendableMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+/**
+ * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
+ * @version 1.0
+ */
+@SuppressWarnings({"ConstantConditions", "unchecked"})
+@Controller
+public class UserGraphController {
+
+    private static final Logger log = LogManager.getLogger();
+
+    @Autowired private ExtensibleConfigRepository repository;
+    @Autowired private SpelServices spelServices;
+
+    private StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+
+    @RequestMapping(
+        value="graph/me",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map queryForMe(
+        HttpServletRequest request,
+        @RequestParam(value = "tagkey", required = false) String tagKey,
+        @RequestParam(value = "tagval", required = false) String tagValue) {
+
+        log.debug("Handling end user graph query tag_key={} tag_value={}", tagKey, tagValue);
+
+        // Placeholder
+        Iterable<ExtensibleConfigJpaEntity> entities;
+
+        if(tagKey != null && tagValue != null) {
+            // If tags have been provided, then use them for query predicates
+            entities = repository.findByTag(tagKey, tagValue);
+        }
+        else {
+            // Query every defined entity
+            entities = repository.findAll();
+        }
+
+        // Create an appendable map to capture the final graph output
+        DeepAppendableMap result = new DeepAppendableMap();
+
+        // Create a root object for security expression evaluation
+        Map rootObject = new HashMap();
+        rootObject.put("claims", request.getAttribute("jwt-claims"));
+        log.debug("SpEL root object {}", rootObject);
+
+        // Process entity results
+        StreamSupport
+            .stream(entities.spliterator(), false)
+            .filter(new QueryEntityAclPredicate(rootObject))
+            .forEach(entity -> {
+                log.trace("Merging entity approved by ACL {}", entity);
+                result.append(entity.getGraph());
+            });
+
+        log.trace("Final graph {}", result);
+
+        // Return final output
+        return result;
+    }
+
+    @RequestMapping(
+        value="graph/inventory/{type}",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List inventory(
+        HttpServletRequest request,
+        @PathVariable String type,
+        @RequestParam(value = "tagkey", required = false) String tagKey,
+        @RequestParam(value = "tagval", required = false) String tagValue) {
+
+        log.debug("Handling end user entity inventory tag_key={} tag_value={}", tagKey, tagValue);
+
+        // Placeholder
+        Iterable<ExtensibleConfigJpaEntity> entities;
+
+        if(tagKey != null && tagValue != null) {
+            // If tags have been provided, then use them for query predicates
+            entities = repository.findByTypeAndTag(type, tagKey, tagValue);
+        }
+        else {
+            // Query all entities by type
+            entities = repository.findByType(type);
+        }
+
+        // Create a root object for security expression evaluation
+        Map rootObject = new HashMap();
+        rootObject.put("claims", request.getAttribute("jwt-claims"));
+        log.debug("SpEL root object {}", rootObject);
+
+        // Process entity results
+        return StreamSupport
+            .stream(entities.spliterator(), false)
+            .filter(new QueryEntityAclPredicate(rootObject))
+            .map(entity -> {
+                Map inventoryObject = new HashMap();
+                inventoryObject.put("type", entity.getType());
+                inventoryObject.put("fname", entity.getFname());
+                inventoryObject.put("tags", entity.getTags());
+                return inventoryObject;
+            })
+            .collect(Collectors.toList());
+
+    }
+
+    class QueryEntityAclPredicate implements Predicate<ExtensibleConfigJpaEntity> {
+
+        private Map rootObject;
+
+        public QueryEntityAclPredicate(Map rootObject) {
+            this.rootObject = rootObject;
+        }
+
+        @Override
+        public boolean test(ExtensibleConfigJpaEntity entity) {
+            // Check if a query ACL is present
+            if(entity.getAcls().containsKey("query")) {
+                log.trace("Evaluating ACL expression={} root={}", entity.getAcls().get("query"), rootObject);
+
+                return (Boolean) UserGraphController
+                    .this.spelServices
+                    .handleExpression(entity.getAcls().get("query"))
+                    .getValue(evaluationContext, rootObject);
+            }
+
+            // If no query ACL, then skip
+            return false;
+        }
+
+    }
+
+}

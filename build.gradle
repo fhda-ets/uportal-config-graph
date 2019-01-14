@@ -1,0 +1,25 @@
+task startTestDatabase(type: Exec) {
+    commandLine "docker",
+        "run", "-d",
+        "-e", "MYSQL_ROOT_PASSWORD=portaldev",
+        "-e", "MYSQL_DATABASE=uportaldev",
+        "-e", "MYSQL_USER=spring",
+        "-e", "MYSQL_PASSWORD=boot",
+        "-p", "3306:3306",
+        "mysql:5.7.24",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+        "--innodb_large_prefix=on"
+}
+
+task startTestTomcat(type: Exec) {
+    dependsOn ":config-graph-core:bootWar"
+
+    commandLine "docker",
+        "run", "-d",
+        "-e", "CATALINA_OPTS=-Dportal.home=/usr/local/tomcat/config",
+        "-v", "${project.rootDir.path}/config:/usr/local/tomcat/config",
+        "-v", "${project.rootDir.path}/config-graph-core/build/libs/uportal-config-graph.war:/usr/local/tomcat/webapps/cg.war",
+        "-p", "9000:8080",
+        "tomcat:8.5.37-jre8-slim"
+}

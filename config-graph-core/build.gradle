@@ -1,0 +1,77 @@
+import edu.fhda.uportal.confgraph.*
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.1.1.RELEASE'
+    id "idea"
+    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id "project-report"
+    id "war"
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+ext['tomcat.version'] = "8.5.37"
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-log4j2"
+    implementation "org.springframework.boot:spring-boot-starter-cache"
+    implementation "com.hazelcast:hazelcast:${project.property("versions.hazelcast")}"
+    implementation "com.hazelcast:hazelcast-hibernate53:1.3.0"
+    implementation "com.hazelcast:hazelcast-aws:2.3"
+    implementation "com.zaxxer:HikariCP:3.2.0"
+    implementation "com.google.guava:guava:27.0.1-jre"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7"
+    implementation "io.jsonwebtoken:jjwt-api:0.10.5"
+    implementation "com.github.ben-manes.caffeine:caffeine:${project.property("versions.caffeine")}"
+    runtime "io.jsonwebtoken:jjwt-impl:0.10.5"
+    runtime "io.jsonwebtoken:jjwt-jackson:0.10.5"
+    providedRuntime "org.springframework.boot:spring-boot-starter-tomcat"
+
+    // RDBMS
+    implementation "mysql:mysql-connector-java:8.0.13"
+    implementation 'org.hsqldb:hsqldb:2.4.1'
+
+    testCompile("org.springframework.boot:spring-boot-starter-test") {
+        // Exclude JUnit 4.x
+        exclude group: "junit", module: "junit"
+    }
+
+    def junit5Version = "5.4.0-SNAPSHOT"
+    testCompile "org.junit.jupiter:junit-jupiter-api:${junit5Version}"
+    testCompile "org.junit.jupiter:junit-jupiter-params:${junit5Version}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junit5Version}"
+    testImplementation "org.junit.platform:junit-platform-commons:1.4.0-SNAPSHOT"
+    testRuntimeOnly "org.junit.platform:junit-platform-engine:1.4.0-SNAPSHOT"
+}
+
+configurations {
+    all {
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    }
+}
+
+bootRun {
+    main = "edu.fhda.uportal.confgraph.SpringBootRunner"
+    args "--spring.config.name=localdev"
+    jvmArgs "-Dportal.home=config"
+}
+
+test {
+    reports {
+        html.enabled = true
+    }
+}
+
+// Declare CLI tasks
+task importFile(type: ImportFileTask)
+task importDirectory(type: ImportDirectoryTask)
