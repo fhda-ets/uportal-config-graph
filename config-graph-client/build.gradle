@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.hazelcast:hazelcast-client:${project.property("versions.hazelcast")}"
+    implementation "com.hazelcast:hazelcast-client:3.11.1"
     // implementation "com.github.ben-manes.caffeine:caffeine:${project.property("versions.caffeine")}"
     implementation "com.squareup.okhttp3:okhttp:3.12.1"
     implementation "org.slf4j:slf4j-api:1.7.25"

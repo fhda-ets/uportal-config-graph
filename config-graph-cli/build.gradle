@@ -1,0 +1,6 @@
+import edu.fhda.uportal.confgraph.ImportDirectoryTask
+import edu.fhda.uportal.confgraph.ImportFileTask
+
+// Declare CLI tasks
+task importFile(type: ImportFileTask)
+task importDirectory(type: ImportDirectoryTask)

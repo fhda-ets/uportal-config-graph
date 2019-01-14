@@ -1,4 +1,5 @@
 rootProject.name = 'uportal-config-graph'
+include 'config-graph-cli'
 include 'config-graph-core'
 include 'config-graph-client'
 
