@@ -23,3 +23,9 @@ task startTestTomcat(type: Exec) {
         "-p", "9000:8080",
         "tomcat:8.5.37-jre8-slim"
 }
+
+task assemble(type: Copy) {
+    dependsOn ":config-graph-core:war"
+    from "config-graph-core/build/libs/config-graph.war"
+    into "$buildDir/libs"
+}
