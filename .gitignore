@@ -1,6 +1,8 @@
 .gradle
 .idea
+.settings
 build
-config
+config/*
+!config/*.sample.*
 config-graph
 out

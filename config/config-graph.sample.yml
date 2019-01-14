@@ -1,0 +1,24 @@
+spring:
+  cache:
+    cache-names: aclSpelExpressions
+    caffeine:
+      spec: expireAfterAccess=3600s
+
+  jpa:
+    show-sql: true
+    format-sql: true
+    use-sql-comments: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.HSQLDialect
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          hazelcast:
+            configuration_file_path: ${portal.home}/config-graph-hz.xml
+          region:
+            factory_class: com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory
+        temp:
+          use_jdbc_metadata_defaults: false
