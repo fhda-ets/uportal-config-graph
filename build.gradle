@@ -24,8 +24,7 @@ task startTestTomcat(type: Exec) {
         "tomcat:8.5.37-jre8-slim"
 }
 
-task war(type: Copy, overwrite: true) {
-    dependsOn ":config-graph-core:war"
-    from "config-graph-core/build/libs/config-graph.war"
-    into "$buildDir/libs"
+// If tomcatDeploy task is found in root project, disable for compatibility with uPortal-start
+if(tomcatDeploy) {
+    tomcatDeploy.enabled = false
 }
