@@ -5,11 +5,8 @@ spring:
       spec: expireAfterAccess=3600s
 
   jpa:
-    show-sql: true
-    format-sql: true
-    use-sql-comments: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.HSQLDialect

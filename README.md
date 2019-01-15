@@ -6,6 +6,12 @@ _Config graph_ is a project designed with the goal of looking at new ways to man
 
 The existing entity system for uPortal has effectively served the needs of portlet deployers for a long period of time. However, should you want to design your own entities beyond what is delivered in core, then the challenge begins. In recent years, the thinking around what makes an ideal product configuration experience has changed significantly. The driving idea for config graph is to take those cutting edge concepts, and distill them into a form that is accessible to the uPortal ecosystem.
 
+**Inspiration / Prior Art:**
+
+- _Understanding Kubernetes Objects:_ https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/
+- _Spring Cloud Config:_ https://spring.io/projects/spring-cloud-config
+- Configuration management platforms such as  _Ansible_, _Terraform_, etc.
+
 ## Features
 
 - Simple schema uniquely identifies an entity by any kind of type and unique identifier
@@ -47,11 +53,13 @@ tags:
   campus: foothill
 ```
 
-## Installation _(for uPortal Start_)
+## Getting Started
+
+### Installation _(for uPortal Start_)
 
 **Note:** At this time, config graph is primarily designed for uPortal implementors using uPortal Start. Let's call it a _preferred_ requirement. However, if you are comfortable working with Gradle and WAR files, then it definitely can work.
 
-1. Change into `overlays` directory
+1. Change into the `overlays` directory
 2. Add the config graph repository as a Git submodule: `git submodule add git@github.com:fhda-ets/uportal-config-graph.git config-graph`
 3. Add the following `settings.gradle` in your root project following the example below. 
 
@@ -62,3 +70,13 @@ project(':overlays:config-graph:config-graph-core').name = 'config-graph'
 ```
 
 4. Perform a trial build using `./gradlew tomcatDeploy` to ensure that adding config graph does not break your existing project.
+
+### Configuration
+
+When config graph starts up, it expects to find two files in `portal.home`: (1) `config-graph.yml`,  and (2) `config-graph-hz.xml`.
+
+The sample configuration in the `config/simple` directory shows how to set up a simple config graph instance using an embedded HSQL database, and Hazelcast as a single member cluster.
+
+A proper configuration of config graph does not require much effort, and primarily involves picking a primary RDBMS datastore where graph files will be imported for storage and querying. This can be the same as your present uPortal database.
+
+Hazelcast configuration is also straightforward. If you use a set number of uPortal servers with static IPs, then you can specify each node by its address, or if permitted on your network, use multicast discovery. If your environment is dynamic, and you require live discovery of your nodes, then Hazelcast has many options including plugins compatible with major cloud service operators.

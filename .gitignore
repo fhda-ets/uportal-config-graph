@@ -4,6 +4,7 @@
 .vscode
 build
 config/*
-!config/*.sample.*
+!config/mysql
+!config/simple
 config-graph
 out
