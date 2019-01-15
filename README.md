@@ -57,7 +57,7 @@ tags:
 
 ### Installation _(for uPortal Start_)
 
-**Note:** At this time, config graph is primarily designed for uPortal implementors using uPortal Start. Let's call it a _preferred_ requirement. However, if you are comfortable working with Gradle and WAR files, then it definitely can work.
+**Note:** At this time, config graph is primarily designed for uPortal implementors using uPortal Start. Let's call it a _preferred_ requirement. However, if you are comfortable working with Gradle and WAR files, then it definitely can work outside of uPortal start.
 
 1. Change into the `overlays` directory
 2. Add the config graph repository as a Git submodule: `git submodule add git@github.com:fhda-ets/uportal-config-graph.git config-graph`
