@@ -17,7 +17,6 @@ repositories {
 }
 
 ext['tomcat.version'] = "8.5.37"
-ext['warFilename'] = "config-graph.war"
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
@@ -73,5 +72,5 @@ test {
 
 war {
     enabled = true
-    archiveName = project.ext.warFilename
+    archiveName = "${rootProject.name}.war"
 }
