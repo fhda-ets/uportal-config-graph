@@ -25,6 +25,6 @@ task startTestTomcat(type: Exec) {
 }
 
 // If tomcatDeploy task is found in root project, disable for compatibility with uPortal-start
-if(tomcatDeploy) {
+if(project.tasks.findByName("tomcatDeploy")) {
     tomcatDeploy.enabled = false
 }
