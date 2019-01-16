@@ -61,12 +61,14 @@ tags:
 
 1. Change into the `overlays` directory
 2. Add the config graph repository as a Git submodule: `git submodule add git@github.com:fhda-ets/uportal-config-graph.git config-graph`
-3. Add the following `settings.gradle` in your root project following the example below. 
+3. Add the following to `settings.gradle` in your root project following the example below. 
 
 ```groovy
 // Import config graph submodule
 include 'overlays:config-graph:config-graph-core'
 project(':overlays:config-graph:config-graph-core').name = 'config-graph'
+include 'overlays:config-graph:config-graph-cli'
+project(':overlays:config-graph:config-graph-cli').name = 'cli'
 ```
 
 4. Perform a trial build using `./gradlew tomcatDeploy` to ensure that adding config graph does not break your existing project.
