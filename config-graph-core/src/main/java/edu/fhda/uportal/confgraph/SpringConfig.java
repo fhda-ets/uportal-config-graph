@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.nio.charset.Charset;
 
 /**
+ * Spring application definition.
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
@@ -25,7 +26,11 @@ import java.nio.charset.Charset;
 @PropertySource(value = "file:${portal.home}/uPortal.properties", ignoreResourceNotFound = true)
 @ServletComponentScan
 public class SpringConfig {
-    
+
+    /**
+     * Create and configure a JWT authentication filter for /admin/* API routes with subject verification.
+     * @param jwtParser Inject an preconfigured instance of a JJWT parser
+     */
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> adminRoutesFilterRegistration(
         @Autowired JwtParser jwtParser){
@@ -36,6 +41,10 @@ public class SpringConfig {
         return registrationBean;
     }
 
+    /**
+     * Create and configure a JWT authentication filter for /graph/* routes for portal end users.
+     * @param jwtParser Inject an preconfigured instance of a JJWT parser
+     */
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> endUserRoutesFilterRegistration(
         @Autowired JwtParser jwtParser){
@@ -46,6 +55,10 @@ public class SpringConfig {
         return registrationBean;
     }
 
+    /**
+     * Configure a JJWT parser using the existing open ID secret taken from <code>uPortal.properties</code>.
+     * @param jwtKey Inject the <code>org.apereo.portal.soffit.jwt.signatureKey</code> property.
+     */
     @Bean
     public JwtParser jwtParser(@Value("${org.apereo.portal.soffit.jwt.signatureKey:NOTSECURE}") String jwtKey) {
         return Jwts

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * JPA attribute converter to de-/serialize a <code>Map&lt;String, String&gt;</code> collections to JSON
+ * strings for database storage. Uses Jackson under the hood.
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */

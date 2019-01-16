@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
+ * Spring controller with routes for performing administrative queries of stored configuration entities.
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
@@ -22,6 +23,13 @@ public class QueryController {
 
     @Autowired ExtensibleConfigRepository repository;
 
+    /**
+     * Query stored entities by type.
+     * @param type Type path variable
+     * @param tagKey Tag key query variable (optional)
+     * @param tagValue Tag valye query variable (optional)
+     * @return List of zero or more entity objects
+     */
     @RequestMapping(
         value="admin/query/{type}",
         method = RequestMethod.GET,
@@ -44,6 +52,12 @@ public class QueryController {
         }
     }
 
+    /**
+     * Query for a specific entity by type and fname.
+     * @param type Type path variable
+     * @param fname Fname path variable
+     * @return The entity
+     */
     @RequestMapping(
         value="admin/query/{type}/{fname}",
         method = RequestMethod.GET,
@@ -54,6 +68,12 @@ public class QueryController {
         return repository.findByTypeAndFname(type, fname);
     }
 
+    /**
+     * Query stored entities by a tag key and value.
+     * @param tagkey Tag key query variable
+     * @param tagval Tag value query variable
+     * @return List of zero or more entity objects
+     */
     @RequestMapping(
         value="admin/query/tag/{tagkey}/{tagval}",
         method = RequestMethod.GET,

@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
+ * Spring controller with routes for portal end-users to build personalized graphs from config entities. Entities
+ * returned by these routes are first authorized by evaluating ACL expressions against the uPortal open ID token for
+ * a user.
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
@@ -35,6 +38,13 @@ public class UserGraphController {
 
     private StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
 
+    /**
+     * Build a graph for a user.
+     * @param request HTTP request
+     * @param tagKey Tag key query variable (optional)
+     * @param tagValue Tag valye query variable (optional)
+     * @return One or more matching graphs merged into a final object
+     */
     @RequestMapping(
         value="graph/me",
         method = RequestMethod.GET,
@@ -82,6 +92,14 @@ public class UserGraphController {
         return result;
     }
 
+    /**
+     * Generate an inventory of stored entities.
+     * @param request HTTP request
+     * @param type Type path variable
+     * @param tagKey Tag key query variable (optional)
+     * @param tagValue Tag valye query variable (optional)
+     * @return List of zero or more basic entity records with type, fname, and tags.
+     */
     @RequestMapping(
         value="graph/inventory/{type}",
         method = RequestMethod.GET,
@@ -127,6 +145,11 @@ public class UserGraphController {
 
     }
 
+    /**
+     * Implementation of a <code>Predicate</code> for stream filtering that verifies if an entity has a query
+     * ACL, and the expression for that ACL matches an input root object with the claims from an open ID token issued
+     * by the portal.
+     */
     class QueryEntityAclPredicate implements Predicate<ExtensibleConfigJpaEntity> {
 
         private Map rootObject;

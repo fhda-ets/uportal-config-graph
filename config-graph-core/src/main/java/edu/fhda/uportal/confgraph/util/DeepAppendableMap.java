@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Extension of a plain HashMap with deep append superpowers so that many maps can be safely merged together to
+ * create one final composite object.
+ * @author https://stackoverflow.com/a/27476077
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
@@ -16,17 +19,21 @@ public class DeepAppendableMap extends HashMap {
         super();
     }
 
+    /**
+     * Deep append all of the keys and properties from another map.
+     * @param source Source map
+     */
     public void append(Map source) {
         deepMerge(this, source);
     }
 
     /**
-     * Originally inspired by https://stackoverflow.com/a/27476077
+     * Taken from https://stackoverflow.com/a/27476077. Modifications added to support merging lists.
      * @param target Destination map for appending new entries
      * @param source Source map to get existing entries from
      * @return The target
      */
-    private static Map deepMerge(Map target, Map source) {
+    protected static Map deepMerge(Map target, Map source) {
         source.forEach((key, value) -> {
             Object existingKey =  target.get(key);
 

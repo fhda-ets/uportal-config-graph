@@ -14,6 +14,9 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
+ * Spring Boot servlet initializer that will be auto-detected by Servlet 3.0 contains to automatically deploy
+ * the config graph web application. Incorporates support for finding configuration files in a location
+ * defined with the <code>portal.home</code> system property.
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
@@ -21,6 +24,9 @@ public class SpringBootWarApplication extends SpringBootServletInitializer {
 
     private static final Logger log = LogManager.getLogger();
 
+    /**
+     * Configure the web application, and build the Spring context.
+     */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
         // Is a portal.home system property available?

@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * Basic implementation of a servlet filter to verify that all incoming requests are authenticated with properly signed
+ * JWT token using the secret configured for uPortal. Optional support for subject verification for access restriction
+ * if even a valid signed key is presented.
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
@@ -22,17 +25,26 @@ public class JwtAuthenticationFilter implements Filter {
     private JwtParser jwtParser;
     private String requiredSubject = null;
 
+    /**
+     * Create a new filter instance without subject verification.
+     * @param jwtParser Pre-configured JJWT parser
+     */
     public JwtAuthenticationFilter(JwtParser jwtParser) {
         this.jwtParser = jwtParser;
     }
 
+    /**
+     * Create a new filter instance with subject verification.
+     * @param jwtParser Pre-configured JJWT parser
+     * @param requiredSubject Value expected for subject in order to clear authentication
+     */
     public JwtAuthenticationFilter(JwtParser jwtParser, String requiredSubject) {
         this.jwtParser = jwtParser;
         this.requiredSubject = requiredSubject;
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    public void init(FilterConfig filterConfig) {}
 
     @Override
     public void destroy() {}

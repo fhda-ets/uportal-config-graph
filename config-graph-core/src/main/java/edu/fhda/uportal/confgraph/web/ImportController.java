@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Spring controller with routes for importing new entities.
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
@@ -32,6 +33,11 @@ public class ImportController {
 
     @Autowired ExtensibleConfigRepository repository;
 
+    /**
+     * Import an entity from a JSON document.
+     * @param bytes Request body as a byte array
+     * @return Outcome of the import operation
+     */
     @RequestMapping(
         value="admin/import",
         method = RequestMethod.POST,
@@ -61,6 +67,11 @@ public class ImportController {
         }
     }
 
+    /**
+     * Import an entity from a YAML document.
+     * @param bytes Request body as a byte array
+     * @return Outcome of the import operation
+     */
     @RequestMapping(
         value="admin/import",
         method = RequestMethod.POST,
