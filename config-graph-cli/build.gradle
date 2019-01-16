@@ -1,6 +1,42 @@
-import edu.fhda.uportal.confgraph.ImportDirectoryTask
-import edu.fhda.uportal.confgraph.ImportFileTask
+plugins {
+    id "java"
+}
 
-// Declare CLI tasks
-task importFile(type: ImportFileTask)
-task importDirectory(type: ImportDirectoryTask)
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "info.picocli:picocli:3.9.1"
+    implementation "org.fusesource.jansi:jansi:1.17.1"
+    implementation "com.squareup.okhttp3:okhttp:3.12.1"
+    implementation "io.jsonwebtoken:jjwt-api:0.10.5"
+    implementation "io.jsonwebtoken:jjwt-impl:0.10.5"
+    implementation "io.jsonwebtoken:jjwt-jackson:0.10.5"
+}
+
+task run(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "edu.fhda.uportal.confgraph.cli.CliRunner"
+    workingDir = rootProject.rootDir
+
+    if(project.hasProperty("portal.home")) {
+        args "--portal-home=${project.findProperty("portal.home")}"
+    }
+
+    if(project.hasProperty("action")) {
+        args "${project.findProperty("action")}"
+    }
+
+    if(project.hasProperty("graph.dir")) {
+        args "--dir=${project.findProperty("graph.dir")}"
+    }
+
+    if(project.hasProperty("graph.file")) {
+        args "--file=${project.findProperty("graph.file")}"
+    }
+}
