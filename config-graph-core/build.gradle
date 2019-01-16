@@ -72,5 +72,5 @@ test {
 
 war {
     enabled = true
-    archiveName = "config-graph.war"
+    archiveName = "${project.name}.war"
 }
