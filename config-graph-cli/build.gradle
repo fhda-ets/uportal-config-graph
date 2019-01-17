@@ -19,6 +19,15 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-jackson:0.10.5"
 }
 
+// Disable uPortal-start tasks for root project
+if(project.tasks.findByName("tomcatClean")) {
+    tomcatClean.enabled = false
+}
+
+if(project.tasks.findByName("tomcatDeploy")) {
+    tomcatDeploy.enabled = false
+}
+
 task run(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "edu.fhda.uportal.confgraph.cli.CliRunner"

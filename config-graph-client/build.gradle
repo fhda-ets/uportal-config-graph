@@ -13,3 +13,12 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:3.12.1"
     implementation "org.slf4j:slf4j-api:1.7.25"
 }
+
+// Disable uPortal-start tasks for root project
+if(project.tasks.findByName("tomcatClean")) {
+    tomcatClean.enabled = false
+}
+
+if(project.tasks.findByName("tomcatDeploy")) {
+    tomcatDeploy.enabled = false
+}
