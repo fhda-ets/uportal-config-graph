@@ -181,6 +181,8 @@ public class UserGraphController {
                         .parseExpression(acl)
                         .getValue(evaluationContext, rootObject);
 
+                    log.debug("Evaluated ACL {} -> result {}", acl, result);
+
                     // If true, exit iteration early
                     if(result) {
                         return true;
@@ -189,6 +191,7 @@ public class UserGraphController {
             }
 
             // If no query ACL, then skip
+            log.debug("No valid user ACLs found for entity {} - excluding from final result", entity);
             return false;
         }
 
