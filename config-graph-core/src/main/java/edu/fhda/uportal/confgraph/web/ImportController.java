@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -108,7 +109,7 @@ public class ImportController {
             (String) payload.get("fname"));
 
         if(payload.containsKey("acls")) {
-            entity.setAcls((Map<String, String>) payload.get("acls"));
+            entity.setAcls((Map<String, List<String>>) payload.get("acls"));
         }
 
         if(payload.containsKey("graph")) {

@@ -7,6 +7,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ public class ExtensibleConfigJpaEntity implements ExtensibleConfigEntity {
     private String fname;
     private Map<String, String> tags = new HashMap<>();
     private Map<String, Object> graph = new HashMap<>();
-    private Map<String, String> acls = new HashMap<>();
+    private Map<String, List<String>> acls = new HashMap<>();
     private LocalDateTime dateCreated;
     private LocalDateTime dateUpdated;
 
@@ -88,7 +89,7 @@ public class ExtensibleConfigJpaEntity implements ExtensibleConfigEntity {
     @Column(name="expression")
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @Override
-    public Map<String, String> getAcls() {
+    public Map<String, List<String>> getAcls() {
         return this.acls;
     }
 
@@ -120,7 +121,7 @@ public class ExtensibleConfigJpaEntity implements ExtensibleConfigEntity {
     }
 
     @Override
-    public void setAcls(Map<String, String> acls) {
+    public void setAcls(Map<String, List<String>> acls) {
         this.acls = acls;
     }
 

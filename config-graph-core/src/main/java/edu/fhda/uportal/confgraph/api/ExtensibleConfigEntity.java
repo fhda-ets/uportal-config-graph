@@ -2,6 +2,7 @@ package edu.fhda.uportal.confgraph.api;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,13 +70,13 @@ public interface ExtensibleConfigEntity extends Serializable {
      * that can be evaluated.
      * @return Map of ACLs
      */
-    Map<String, String> getAcls();
+    Map<String, List<String>> getAcls();
 
     /**
      * Set the map of ACL expressions used to protect this entity.
      * @param acls Map of ACLs
      */
-    void setAcls(Map<String, String> acls);
+    void setAcls(Map<String, List<String>> acls);
 
     /**
      * Get the timestamp for when the entity was created. Used for auditing in the storage backend.

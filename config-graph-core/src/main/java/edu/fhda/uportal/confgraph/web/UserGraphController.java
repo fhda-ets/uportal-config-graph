@@ -154,7 +154,7 @@ public class UserGraphController {
 
         private Map rootObject;
 
-        public QueryEntityAclPredicate(Map rootObject) {
+        QueryEntityAclPredicate(Map rootObject) {
             this.rootObject = rootObject;
         }
 
@@ -164,10 +164,23 @@ public class UserGraphController {
             if(entity.getAcls().containsKey("query")) {
                 log.trace("Evaluating ACL expression={} root={}", entity.getAcls().get("query"), rootObject);
 
-                return (Boolean) UserGraphController
-                    .this.spelServices
-                    .handleExpression(entity.getAcls().get("query"))
-                    .getValue(evaluationContext, rootObject);
+                // Get entity ACLs for query action
+                List<String> acls = entity.getAcls().get("query");
+
+                // Iterate each expression
+                for(String acl : acls) {
+                    // Run the expression
+                    boolean result = (Boolean) UserGraphController
+                        .this
+                        .spelServices
+                        .parseExpression(acl)
+                        .getValue(evaluationContext, rootObject);
+
+                    // If true, exit iteration early
+                    if(result) {
+                        return true;
+                    }
+                }
             }
 
             // If no query ACL, then skip

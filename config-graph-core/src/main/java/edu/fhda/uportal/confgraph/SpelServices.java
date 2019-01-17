@@ -22,7 +22,7 @@ public class SpelServices {
      * @return SpEL expression object
      */
     @Cacheable(value = "aclSpelExpressions", sync = true)
-    public Expression handleExpression(String source) {
+    public Expression parseExpression(String source) {
         return expressionParser.parseExpression(source);
     }
 
