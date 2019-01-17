@@ -79,15 +79,10 @@ public class ExtensibleConfigJpaEntity implements ExtensibleConfigEntity {
     public Map<String, Object> getGraph() {
         return this.graph;
     }
-
-    @ElementCollection
-    @CollectionTable(name = "config_entity_acl", joinColumns={
-        @JoinColumn(name="fname"),
-        @JoinColumn(name="type"),
-    })
-    @MapKeyColumn (name="action")
-    @Column(name="expression")
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    
+    @Column(name="acls")
+    @Lob
+    @Convert(converter = JacksonGraphConverter.class)
     @Override
     public Map<String, List<String>> getAcls() {
         return this.acls;
