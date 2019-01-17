@@ -72,7 +72,7 @@ public class ExtensibleConfigJpaEntity implements ExtensibleConfigEntity {
         return this.tags;
     }
 
-    @Column(name="graph")
+    @Column(name="graph", length = 131072)
     @Lob
     @Convert(converter = JacksonGraphConverter.class)
     @Override
@@ -80,7 +80,7 @@ public class ExtensibleConfigJpaEntity implements ExtensibleConfigEntity {
         return this.graph;
     }
     
-    @Column(name="acls")
+    @Column(name="acls", length = 131072)
     @Lob
     @Convert(converter = JacksonGraphConverter.class)
     @Override
