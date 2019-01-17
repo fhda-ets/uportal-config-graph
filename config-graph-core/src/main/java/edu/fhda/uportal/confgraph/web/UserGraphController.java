@@ -160,6 +160,11 @@ public class UserGraphController {
 
         @Override
         public boolean test(ExtensibleConfigJpaEntity entity) {
+            // Check if entity is tagged disabled
+            if(entity.getTags().get("graph.disabled").equalsIgnoreCase("true")) {
+                return false;
+            }
+
             // Check if a query ACL is present
             if(entity.getAcls().containsKey("query")) {
                 log.trace("Evaluating ACL expression={} root={}", entity.getAcls().get("query"), rootObject);
