@@ -160,8 +160,8 @@ public class UserGraphController {
 
         @Override
         public boolean test(ExtensibleConfigJpaEntity entity) {
-            // Check if entity is tagged disabled
-            if(entity.getTags().get("graph.disabled").equalsIgnoreCase("true")) {
+            // Check if entity has disabled tag
+            if(entity.getTags().getOrDefault("graph.disabled", "false").equalsIgnoreCase("true")) {
                 return false;
             }
 
