@@ -190,7 +190,7 @@ public class UserGraphController {
                 }
             }
 
-            // If no query ACL, then skip
+            // If user cannot pass any query ACLs, then exclude entity
             log.debug("No valid user ACLs found for entity {} - excluding from final result", entity);
             return false;
         }
