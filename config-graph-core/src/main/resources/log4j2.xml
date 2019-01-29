@@ -9,11 +9,11 @@
 
     <Loggers>
         <!-- Uncomment to debug connectivity issues to RDBMS -->
-        <!--<Logger name="com.zaxxer" level="debug" />-->
+        <Logger name="com.zaxxer" level="debug" />
 
         <!-- Uncomment to debug issues with Hibernate L2 caching -->
         <!--<Logger name="org.ehcache" level="debug" />-->
-        <Logger name="com.hazelcast" level="debug" />
+        <Logger name="com.hazelcast" level="info" />
         <Logger name="org.hibernate.cache" level="debug" />
         <Logger name="edu.fhda" level="debug" />/>
         
