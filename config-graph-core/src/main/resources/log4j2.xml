@@ -28,7 +28,7 @@
         <!-- Uncomment to debug issues with Hibernate L2 caching -->
         <!--<Logger name="org.ehcache" level="debug" />-->
         <Logger name="com.hazelcast" level="info" />
-        <Logger name="org.hibernate.cache" level="debug" />
+        <Logger name="org.hibernate" level="debug" />
         <Logger name="org.hibernate.SQL" level="debug" />
         <Logger name="edu.fhda" level="debug" />/>
 
