@@ -1,3 +1,8 @@
+config-graph:
+  startup:
+    disk-loader:
+      paths: config-graph
+
 spring:
   cache:
     cache-names: aclSpelExpressions
