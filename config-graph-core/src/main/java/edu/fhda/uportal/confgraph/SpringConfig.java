@@ -1,14 +1,19 @@
 package edu.fhda.uportal.confgraph;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import edu.fhda.uportal.confgraph.web.security.JwtAuthenticationFilter;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -26,6 +31,8 @@ import java.nio.charset.Charset;
 @PropertySource(value = "file:${portal.home}/uPortal.properties", ignoreResourceNotFound = true)
 @ServletComponentScan
 public class SpringConfig {
+
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * Create and configure a JWT authentication filter for /admin/* API routes with subject verification.
@@ -64,6 +71,17 @@ public class SpringConfig {
         return Jwts
             .parser()
             .setSigningKey(jwtKey.getBytes(Charset.defaultCharset()));
+    }
+
+    @Bean("jacksonJsonMapper")
+    @Primary
+    public ObjectMapper jacksonJsonMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean("jacksonYamlMapper")
+    public ObjectMapper jacksonYamlMapper() {
+        return new ObjectMapper(new YAMLFactory());
     }
 
 }

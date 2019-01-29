@@ -1,12 +1,12 @@
 package edu.fhda.uportal.confgraph.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigJpaEntity;
 import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,9 +29,8 @@ public class ImportController {
 
     private static final Logger log = LogManager.getLogger();
 
-    private ObjectMapper jsonMapper = new ObjectMapper();
-    private ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-
+    @Autowired @Qualifier("jacksonJsonMapper") ObjectMapper jacksonJsonMapper;
+    @Autowired @Qualifier("jacksonYamlMapper") ObjectMapper jacksonYamlMapper;
     @Autowired ExtensibleConfigRepository repository;
 
     /**
@@ -51,7 +50,7 @@ public class ImportController {
             Map<String, Object> response = new HashMap<>();
 
             // Parse YAML from request body
-            Map<String, Object> payload = jsonMapper.readValue(bytes, HashMap.class);
+            Map<String, Object> payload = jacksonJsonMapper.readValue(bytes, HashMap.class);
             log.debug("Received new JSON import type={} fname={}", payload.get("type"), payload.get("fname"));
 
             // Delegate to internal mapping method
@@ -85,7 +84,7 @@ public class ImportController {
             Map<String, Object> response = new HashMap<>();
 
             // Parse YAML from request body
-            Map<String, Object> payload = yamlMapper.readValue(bytes, HashMap.class);
+            Map<String, Object> payload = jacksonYamlMapper.readValue(bytes, HashMap.class);
             log.debug("Received new YAML import type={} fname={}", payload.get("type"), payload.get("fname"));
 
             // Delegate to internal mapping method
