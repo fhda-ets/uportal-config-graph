@@ -5,6 +5,19 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
+
+        <RollingFile
+                name="CatalinaLogs"
+                fileName="${sys:catalina.home}/logs/config-graph.log"
+                filePattern="${sys:catalina.home}/logs/config-graph-%i.log.gz"
+                ignoreExceptions="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="8 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="2"/>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
@@ -18,7 +31,8 @@
         <Logger name="edu.fhda" level="debug" />/>
         
         <Root level="error">
-            <AppenderRef ref="Console" />
+            <!--<AppenderRef ref="Console" />-->
+            <AppenderRef ref="CatalinaLogs" />
         </Root>
     </Loggers>
     
