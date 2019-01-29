@@ -8,7 +8,7 @@
         </Console>
 
         <RollingFile
-                name="Port"
+                name="CatalinaLogs"
                 fileName="${sys:catalina.home}/logs/config-graph.log"
                 filePattern="${sys:catalina.home}/logs/config-graph-%i.log.gz"
                 ignoreExceptions="false">
