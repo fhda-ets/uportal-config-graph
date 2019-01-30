@@ -2,6 +2,7 @@ package edu.fhda.uportal.confgraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import edu.fhda.uportal.confgraph.util.YamlPropertySourceFactory;
 import edu.fhda.uportal.confgraph.web.security.JwtAuthenticationFilter;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -16,8 +17,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.annotation.PostConstruct;
 import java.nio.charset.Charset;
 
 /**
@@ -29,10 +32,18 @@ import java.nio.charset.Charset;
 @EnableJpaRepositories(basePackages = "edu.fhda.uportal.confgraph.impl.jpa")
 @EnableTransactionManagement
 @PropertySource(value = "file:${portal.home}/uPortal.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "file:${portal.home}/config-graph.yml", ignoreResourceNotFound = true, factory = YamlPropertySourceFactory.class)
 @ServletComponentScan
 public class SpringConfig {
 
     private static final Logger log = LogManager.getLogger();
+
+    @Autowired LocalContainerEntityManagerFactoryBean entityManagerFactoryBean;
+
+    @PostConstruct
+    public void postInit() {
+        log.info("Entity manager properties {}", entityManagerFactoryBean.getJpaPropertyMap());
+    }
 
     /**
      * Create and configure a JWT authentication filter for /admin/* API routes with subject verification.
