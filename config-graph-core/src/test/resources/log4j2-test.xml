@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="WARN">
+
+    <Appenders>
+        <RollingFile
+                name="RollingLog"
+                fileName="logs/config-graph.log"
+                filePattern="logs/config-graph-%i.log.gz"
+                ignoreExceptions="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="8 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="2"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Uncomment to debug connectivity issues to RDBMS -->
+        <!--<Logger name="com.zaxxer" level="debug" />-->
+
+        <!-- Uncomment to debug issues with Hibernate -->
+        <!--<Logger name="org.hibernate" level="debug" />-->
+        <!--<Logger name="org.hibernate.SQL" level="debug" />-->
+        <Logger name="com.hazelcast" level="info" />
+        <Logger name="edu.fhda" level="debug" />/>
+
+        <Root level="error">
+            <AppenderRef ref="RollingLog" />
+        </Root>
+    </Loggers>
+    
+</Configuration>
