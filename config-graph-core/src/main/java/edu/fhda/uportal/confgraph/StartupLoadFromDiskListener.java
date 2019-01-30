@@ -57,6 +57,9 @@ public class StartupLoadFromDiskListener implements ApplicationListener<ContextR
         Stream.of(rawPaths.split(";"))
             .map(Paths::get)
             .forEach(inputDirectory -> {
+                // Log the absolute path
+                log.info("Walking directory {}", inputDirectory.toAbsolutePath().toString());
+
                 // Walk directory
                 try {
                     Files.walk(inputDirectory)
