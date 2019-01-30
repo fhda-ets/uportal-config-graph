@@ -25,7 +25,7 @@
         <!--<Logger name="org.hibernate" level="debug" />-->
         <!--<Logger name="org.hibernate.SQL" level="debug" />-->
         <Logger name="com.hazelcast" level="info" />
-        <Logger name="edu.fhda" level="debug" />/>
+        <Logger name="edu.fhda" level="debug" />
 
         <Root level="error">
             <AppenderRef ref="CatalinaLogs" />
