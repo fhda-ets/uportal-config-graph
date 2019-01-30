@@ -7,4 +7,5 @@ config/*
 !config/mysql
 !config/simple
 config-graph
+logs
 out
