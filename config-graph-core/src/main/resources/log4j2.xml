@@ -3,10 +3,6 @@
 <Configuration status="WARN">
 
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
-
         <RollingFile
                 name="CatalinaLogs"
                 fileName="${sys:catalina.home}/logs/config-graph.log"
@@ -23,17 +19,15 @@
 
     <Loggers>
         <!-- Uncomment to debug connectivity issues to RDBMS -->
-        <Logger name="com.zaxxer" level="debug" />
+        <!--<Logger name="com.zaxxer" level="debug" />-->
 
-        <!-- Uncomment to debug issues with Hibernate L2 caching -->
-        <!--<Logger name="org.ehcache" level="debug" />-->
+        <!-- Uncomment to debug issues with Hibernate -->
+        <!--<Logger name="org.hibernate" level="debug" />-->
+        <!--<Logger name="org.hibernate.SQL" level="debug" />-->
         <Logger name="com.hazelcast" level="info" />
-        <Logger name="org.hibernate" level="debug" />
-        <Logger name="org.hibernate.SQL" level="debug" />
         <Logger name="edu.fhda" level="debug" />/>
 
         <Root level="error">
-            <!--<AppenderRef ref="Console" />-->
             <AppenderRef ref="CatalinaLogs" />
         </Root>
     </Loggers>
