@@ -78,6 +78,9 @@ public class SpringConfig {
     public JwtParser jwtParser(
         @Value("${org.apereo.portal.soffit.jwt.signatureKey:NOTSECURE}") String jwtKey,
         @Value("${config-graph.jwt.signing-algorithm:HS256}") String jwtSigningAlgorithm) {
+
+        log.debug("Setting up JWT parser secretKey={}", jwtKey);
+        
         // Generate secret key object
         Key signingKey =
             new SecretKeySpec(
