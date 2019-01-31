@@ -6,6 +6,7 @@ import edu.fhda.uportal.confgraph.util.YamlPropertySourceFactory;
 import edu.fhda.uportal.confgraph.web.security.JwtAuthenticationFilter;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.Charset;
+import java.security.Key;
 
 /**
  * Spring application definition.
@@ -72,10 +75,20 @@ public class SpringConfig {
      * @param jwtKey Inject the <code>org.apereo.portal.soffit.jwt.signatureKey</code> property.
      */
     @Bean
-    public JwtParser jwtParser(@Value("${org.apereo.portal.soffit.jwt.signatureKey:NOTSECURE}") String jwtKey) {
+    public JwtParser jwtParser(
+        @Value("${org.apereo.portal.soffit.jwt.signatureKey:NOTSECURE}") String jwtKey,
+        @Value("${config-graph.jwt.signing-algorithm:HS256}") String jwtSigningAlgorithm) {
+        // Generate secret key object
+        Key signingKey =
+            new SecretKeySpec(
+                jwtKey.getBytes(
+                    Charset.defaultCharset()),
+                    SignatureAlgorithm.forName(jwtSigningAlgorithm).getJcaName());
+
+        // Create parser
         return Jwts
             .parser()
-            .setSigningKey(jwtKey.getBytes(Charset.defaultCharset()));
+            .setSigningKey(signingKey);
     }
 
     @Bean("jacksonJsonMapper")
