@@ -20,7 +20,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.annotation.PostConstruct;
 import java.nio.charset.Charset;
 
 /**
@@ -39,11 +38,6 @@ public class SpringConfig {
     private static final Logger log = LogManager.getLogger();
 
     @Autowired LocalContainerEntityManagerFactoryBean entityManagerFactoryBean;
-
-    @PostConstruct
-    public void postInit() {
-        log.info("Entity manager properties {}", entityManagerFactoryBean.getJpaPropertyMap());
-    }
 
     /**
      * Create and configure a JWT authentication filter for /admin/* API routes with subject verification.
