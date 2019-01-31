@@ -55,6 +55,12 @@ public class JwtAuthenticationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        // If OPTIONS request, allow pass through
+        if(httpRequest.getMethod().equalsIgnoreCase("OPTIONS")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         // Get authorization header
         String header = httpRequest.getHeader("Authorization");
         log.debug("Authorization header '{}'", header);
