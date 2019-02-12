@@ -22,6 +22,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.Charset;
 import java.security.Key;
 
@@ -80,15 +81,18 @@ public class SpringConfig {
         @Value("${config-graph.jwt.signature-algorithm:HS256}") String jwtSigningAlgorithm) {
 
         log.debug("Setting up JWT parser alg={} secretKey={}", jwtSigningAlgorithm, jwtKey);
+
+        // Encode cleartext key with Base64
+        String base64Key = DatatypeConverter.printBase64Binary(jwtKey.getBytes());
         
         // Generate secret key object
         Key signingKey =
             new SecretKeySpec(
-                jwtKey.getBytes(
+                base64Key.getBytes(
                     Charset.defaultCharset()),
                     SignatureAlgorithm.forName(jwtSigningAlgorithm).getJcaName());
 
-        // Create parser
+        // Configure parser bean
         return Jwts
             .parser()
             .setSigningKey(signingKey);
