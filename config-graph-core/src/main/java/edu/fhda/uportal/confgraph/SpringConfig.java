@@ -6,7 +6,6 @@ import edu.fhda.uportal.confgraph.util.YamlPropertySourceFactory;
 import edu.fhda.uportal.confgraph.web.security.JwtAuthenticationFilter;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import java.security.Key;
 
 /**
  * Spring application definition.
@@ -78,16 +75,10 @@ public class SpringConfig {
 
         log.debug("Setting up JWT parser secretKey={}", jwtKey);
 
-        // Convert configured key to bytes
-        byte[] keyAsBytes = jwtKey.getBytes();
-        
-        // Generate secret key object
-        Key signingKey = Keys.hmacShaKeyFor(keyAsBytes);
-
         // Configure parser bean
         return Jwts
             .parser()
-            .setSigningKey(signingKey);
+            .setSigningKey(jwtKey);
     }
 
     @Bean("jacksonJsonMapper")
