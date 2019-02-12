@@ -6,7 +6,7 @@ import edu.fhda.uportal.confgraph.util.YamlPropertySourceFactory;
 import edu.fhda.uportal.confgraph.web.security.JwtAuthenticationFilter;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +21,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.Charset;
 import java.security.Key;
 
 /**
@@ -77,20 +74,15 @@ public class SpringConfig {
      */
     @Bean
     public JwtParser jwtParser(
-        @Value("${org.apereo.portal.soffit.jwt.signatureKey:NOTSECURE}") String jwtKey,
-        @Value("${config-graph.jwt.signature-algorithm:HS256}") String jwtSigningAlgorithm) {
+        @Value("${org.apereo.portal.soffit.jwt.signatureKey:NOTSECURE}") String jwtKey) {
 
-        log.debug("Setting up JWT parser alg={} secretKey={}", jwtSigningAlgorithm, jwtKey);
+        log.debug("Setting up JWT parser secretKey={}", jwtKey);
 
-        // Encode cleartext key with Base64
-        String base64Key = DatatypeConverter.printBase64Binary(jwtKey.getBytes());
+        // Convert configured key to bytes
+        byte[] keyAsBytes = jwtKey.getBytes();
         
         // Generate secret key object
-        Key signingKey =
-            new SecretKeySpec(
-                base64Key.getBytes(
-                    Charset.defaultCharset()),
-                    SignatureAlgorithm.forName(jwtSigningAlgorithm).getJcaName());
+        Key signingKey = Keys.hmacShaKeyFor(keyAsBytes);
 
         // Configure parser bean
         return Jwts
