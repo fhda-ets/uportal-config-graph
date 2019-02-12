@@ -24,7 +24,7 @@ public class BasicIntegrationTests {
     @Test
     @DisplayName("Create a new config entity")
     @Order(1)
-    public void createNewEntity() {
+    void createNewEntity() {
         // Create a new entity
         ExtensibleConfigJpaEntity entity = new ExtensibleConfigJpaEntity("content", "student");
 
@@ -42,7 +42,7 @@ public class BasicIntegrationTests {
     @Test
     @DisplayName("Query entity by tags")
     @Order(2)
-    public void queryEntityByTags() {
+    void queryEntityByTags() {
         List<ExtensibleConfigJpaEntity> entities = repository
             .findByTag("campus", "foothill");
 
@@ -53,7 +53,7 @@ public class BasicIntegrationTests {
     @DisplayName("Delete entity by type and fname")
     @Order(3)
     @Disabled
-    public void removeEntity() {
+    void removeEntity() {
         ExtensibleConfigJpaEntity entity = repository.findByTypeAndFname("content", "student");
         repository.delete(entity);
     }
