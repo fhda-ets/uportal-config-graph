@@ -19,7 +19,7 @@ public class SpringMvcConfiguration implements WebMvcConfigurer {
 
     private static final Logger log = LogManager.getLogger();
 
-    @Value("${config-graph.cors-config.allowed-origins}")
+    @Value("${config-graph.cors-config.allowed-origins:}")
     private String configuredOrigins;
 
     @Override
