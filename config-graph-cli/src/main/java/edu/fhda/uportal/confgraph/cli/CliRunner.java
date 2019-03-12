@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Properties;
 
 
@@ -64,9 +65,10 @@ public class CliRunner {
                 // Get configured config graph URL for API calls
                 configGraphUrl = portalProperties.getProperty("edu.fhda.confgraph.url");
 
-                // Create JWT token signing key
+                // Create JWT token signing key (JJWT validates keys with the assumption that they are Base64 encoded)
                 String jwtSignatureKey = portalProperties.getProperty("org.apereo.portal.soffit.jwt.signatureKey");
-                SecretKey jwtSecretKey = Keys.hmacShaKeyFor(jwtSignatureKey.getBytes());
+                byte[] decodedKey = Base64.getDecoder().decode(jwtSignatureKey.getBytes());
+                SecretKey jwtSecretKey = Keys.hmacShaKeyFor(decodedKey);
                 jwtSignedKey = Jwts
                     .builder()
                     .setSubject("admin")
