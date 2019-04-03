@@ -63,4 +63,4 @@ class ImportTask extends DefaultTask {
 
 }
 
-task configGraph(type: ImportTask)
+task configGraphImport(type: ImportTask)
