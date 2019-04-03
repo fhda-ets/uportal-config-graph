@@ -16,7 +16,7 @@ public class ImportFile implements Runnable {
     @CommandLine.ParentCommand
     private CliRunner.RootCommand root;
 
-    @CommandLine.Option(names = "--file", description = "Graph file to import")
+    @CommandLine.Parameters
     private Path inputFile;
 
     @Override

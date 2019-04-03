@@ -64,6 +64,7 @@ public class CliRunner {
 
                 // Get configured config graph URL for API calls
                 configGraphUrl = portalProperties.getProperty("edu.fhda.confgraph.url");
+                System.out.format("Using config graph URL %s/admin/import%n", configGraphUrl);
 
                 // Create JWT token signing key (JJWT validates keys with the assumption that they are Base64 encoded)
                 String jwtSignatureKey = portalProperties.getProperty("org.apereo.portal.soffit.jwt.signatureKey");

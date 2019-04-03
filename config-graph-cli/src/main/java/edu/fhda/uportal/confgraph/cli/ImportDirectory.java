@@ -18,7 +18,7 @@ public class ImportDirectory implements Runnable {
     @CommandLine.ParentCommand
     private CliRunner.RootCommand root;
 
-    @CommandLine.Option(names = "--dir", description = "Directory of graph files to import")
+    @CommandLine.Parameters
     private Path inputDirectory;
 
     @Override
