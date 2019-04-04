@@ -32,6 +32,7 @@ class ImportTask extends DefaultTask {
 
     ImportTask() {
         this.group = "Config Graph (Foothill-De Anza)"
+        this.dependsOn("classes")
     }
 
     String action = "import-dir"
