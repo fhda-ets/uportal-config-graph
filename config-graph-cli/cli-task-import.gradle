@@ -43,7 +43,7 @@ class ImportTask extends DefaultTask {
 
     @Option(option = "portal-home", description = "Set the portal home directory to local configuration from uPortal.properties")
     void setPortalHome(String path) {
-        project.file(path).withReader { reader -> portalProperties.load(reader) }
+        project.rootProject.file("${path}/uPortal.properties").withReader { reader -> portalProperties.load(reader) }
 
         // Unpack the config graph URL from portal properties
         this.setConfigGraphUrl(portalProperties.getProperty("edu.fhda.confgraph.url"))
