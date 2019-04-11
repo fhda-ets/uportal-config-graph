@@ -7,7 +7,7 @@ import com.hazelcast.config.FileSystemXmlConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import edu.fhda.uportal.confgraph.impl.hz.ExtensibleHazelcastEntity;
+import edu.fhda.uportal.confgraph.impl.hazelcast.ExtensibleHazelcastEntity;
 import edu.fhda.uportal.confgraph.util.YamlPropertySourceFactory;
 import edu.fhda.uportal.confgraph.web.security.JwtAuthenticationFilter;
 import io.jsonwebtoken.JwtParser;

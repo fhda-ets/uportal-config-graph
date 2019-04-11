@@ -4,7 +4,7 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.EntryObject;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.PredicateBuilder;
-import edu.fhda.uportal.confgraph.impl.hz.ExtensibleHazelcastEntity;
+import edu.fhda.uportal.confgraph.impl.hazelcast.ExtensibleHazelcastEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

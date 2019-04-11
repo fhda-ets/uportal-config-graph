@@ -1,4 +1,4 @@
-package edu.fhda.uportal.confgraph.impl.hz;
+package edu.fhda.uportal.confgraph.impl.hazelcast;
 
 import edu.fhda.uportal.confgraph.api.AbstractExtensibleConfigEntity;
 

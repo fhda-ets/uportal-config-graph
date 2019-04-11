@@ -2,7 +2,7 @@ package edu.fhda.uportal.confgraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
-import edu.fhda.uportal.confgraph.impl.hz.ExtensibleHazelcastEntity;
+import edu.fhda.uportal.confgraph.impl.hazelcast.ExtensibleHazelcastEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

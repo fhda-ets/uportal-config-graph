@@ -10,7 +10,7 @@
         <optimize-queries>true</optimize-queries>
 
         <attributes>
-            <attribute extractor="edu.fhda.uportal.confgraph.impl.hz.TagValueExtractor">tags</attribute>
+            <attribute extractor="edu.fhda.uportal.confgraph.impl.hazelcast.TagValueExtractor">tags</attribute>
         </attributes>
 
         <indexes>

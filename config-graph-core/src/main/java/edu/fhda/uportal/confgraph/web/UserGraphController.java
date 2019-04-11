@@ -1,8 +1,6 @@
 package edu.fhda.uportal.confgraph.web;
 
 import edu.fhda.uportal.confgraph.SpelServices;
-import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigJpaEntity;
-import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigRepository;
 import edu.fhda.uportal.confgraph.util.DeepAppendableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

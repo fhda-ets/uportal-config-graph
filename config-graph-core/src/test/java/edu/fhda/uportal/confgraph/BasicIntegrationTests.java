@@ -4,7 +4,7 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.EntryObject;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.PredicateBuilder;
-import edu.fhda.uportal.confgraph.impl.hz.ExtensibleHazelcastEntity;
+import edu.fhda.uportal.confgraph.impl.hazelcast.ExtensibleHazelcastEntity;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

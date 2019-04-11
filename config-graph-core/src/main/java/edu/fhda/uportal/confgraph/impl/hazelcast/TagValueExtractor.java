@@ -1,4 +1,4 @@
-package edu.fhda.uportal.confgraph.impl.hz;
+package edu.fhda.uportal.confgraph.impl.hazelcast;
 
 import com.hazelcast.query.extractor.ValueCollector;
 import com.hazelcast.query.extractor.ValueExtractor;
