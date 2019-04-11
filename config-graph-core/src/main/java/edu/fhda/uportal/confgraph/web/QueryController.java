@@ -1,7 +1,10 @@
 package edu.fhda.uportal.confgraph.web;
 
-import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigJpaEntity;
-import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigRepository;
+import com.hazelcast.core.IMap;
+import com.hazelcast.query.EntryObject;
+import com.hazelcast.query.Predicate;
+import com.hazelcast.query.PredicateBuilder;
+import edu.fhda.uportal.confgraph.impl.hz.ExtensibleHazelcastEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Spring controller with routes for performing administrative queries of stored configuration entities.
@@ -21,7 +25,7 @@ public class QueryController {
 
     private static final Logger log = LogManager.getLogger();
 
-    @Autowired ExtensibleConfigRepository repository;
+    @Autowired IMap<String, ExtensibleHazelcastEntity> entityStorageMap;
 
     /**
      * Query stored entities by type.
@@ -35,20 +39,28 @@ public class QueryController {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<ExtensibleConfigJpaEntity> queryByType(
+    public Collection<ExtensibleHazelcastEntity> queryByType(
         @PathVariable String type,
         @RequestParam(value = "tagkey", required = false) String tagKey,
         @RequestParam(value = "tagval", required = false) String tagValue) {
 
         log.debug("Handling entity type query type={} tag_key={} tag_value={}", type, tagKey, tagValue);
 
+        // Prepare query
+        EntryObject entry = new PredicateBuilder().getEntryObject();
+
         if(tagKey != null && tagValue != null) {
             // If tags have been provided, then use them as part of query predicates
-            return repository.findByTypeAndTag(type, tagKey, tagValue);
+            Predicate predicate = entry
+                .get("type").equal(type)
+                .and(entry.get("tags").equal(tagKey + "=" + tagValue));
+
+            return entityStorageMap.values(predicate);
         }
         else {
             // Query exclusively by entity type
-            return repository.findByType(type);
+            Predicate predicate = entry.get("type").equal(type);
+            return entityStorageMap.values(predicate);
         }
     }
 
@@ -63,15 +75,22 @@ public class QueryController {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ExtensibleConfigJpaEntity queryByTypeAndTags(@PathVariable String type, @PathVariable String fname) {
+    public ExtensibleHazelcastEntity queryByTypeAndTags(@PathVariable String type, @PathVariable String fname) {
         log.debug("Handling entity type and fname query type={} fname={}", type, fname);
-        return repository.findByTypeAndFname(type, fname);
+        // Prepare query
+        EntryObject entry = new PredicateBuilder().getEntryObject();
+        Predicate predicate = entry
+            .get("type").equal(type)
+            .and(entry.get("fname").equal(fname));
+
+        // Execute query
+        return new ArrayList<>(entityStorageMap.values(predicate)).get(0);
     }
 
     /**
      * Query stored entities by a tag key and value.
-     * @param tagkey Tag key query variable
-     * @param tagval Tag value query variable
+     * @param tagKey Tag key query variable
+     * @param tagValue Tag value query variable
      * @return List of zero or more entity objects
      */
     @RequestMapping(
@@ -79,9 +98,14 @@ public class QueryController {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<ExtensibleConfigJpaEntity> queryByTags(@PathVariable String tagkey, @PathVariable String tagval) {
-        log.debug("Handling entity tag query key={} value={}", tagkey, tagval);
-        return repository.findByTag(tagkey, tagval);
+    public Collection<ExtensibleHazelcastEntity> queryByTags(@PathVariable String tagKey, @PathVariable String tagValue) {
+        log.debug("Handling entity tag query key={} value={}", tagKey, tagValue);
+        // Prepare query
+        EntryObject entry = new PredicateBuilder().getEntryObject();
+        Predicate predicate = entry.get("tags").equal(tagKey + "=" + tagValue);
+
+        // Execute query
+        return entityStorageMap.values(predicate);
     }
 
 }

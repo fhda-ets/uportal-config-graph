@@ -23,22 +23,10 @@ public interface ExtensibleConfigEntity extends Serializable {
     String getType();
 
     /**
-     * Set the named type of this entity.
-     * @param type Type to be set
-     */
-    void setType(String type);
-
-    /**
      * Get the functional name of this entity. Should be a unique identifier among many entity objects of the same type.
      * @return Functional name or "fname"
      */
     String getFname();
-
-    /**
-     * Set the functional name of this entity.
-     * @param fname The functional name
-     */
-    void setFname(String fname);
 
     /**
      * Get the tags assigned to this entity. Tags can be used to add arbitrary pieces of data can be indexed in a backend
@@ -85,21 +73,10 @@ public interface ExtensibleConfigEntity extends Serializable {
     LocalDateTime getDateCreated();
 
     /**
-     * Set the timestamp for when the entity was created.
-     * @param dateCreated Created timestamp
-     */
-    void setDateCreated(LocalDateTime dateCreated);
-
-    /**
      * Get the timestamp for when the entity was last updated. Used for auditing in the storage backend.
      * @return Updated timestamp
      */
     LocalDateTime getDateUpdated();
 
-    /**
-     * Set the timestamp for when the entity was last updated. Used for auditing in the storage backend.
-     * @param dateUpdated Updated timestamp
-     */
-    void setDateUpdated(LocalDateTime dateUpdated);
 
 }

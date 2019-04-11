@@ -1,8 +1,8 @@
 package edu.fhda.uportal.confgraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigJpaEntity;
-import edu.fhda.uportal.confgraph.impl.jpa.ExtensibleConfigRepository;
+import com.hazelcast.core.IMap;
+import edu.fhda.uportal.confgraph.impl.hz.ExtensibleHazelcastEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class StartupLoadFromDiskListener implements ApplicationListener<ContextR
 
     @Autowired @Qualifier("jacksonJsonMapper") ObjectMapper jacksonJsonMapper;
     @Autowired @Qualifier("jacksonYamlMapper") ObjectMapper jacksonYamlMapper;
-    @Autowired ExtensibleConfigRepository repository;
+    @Autowired IMap<String, ExtensibleHazelcastEntity> entityStorageMap;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -89,7 +89,7 @@ public class StartupLoadFromDiskListener implements ApplicationListener<ContextR
             }
 
             // Map into new entity
-            ExtensibleConfigJpaEntity entity = new ExtensibleConfigJpaEntity(
+            ExtensibleHazelcastEntity entity = new ExtensibleHazelcastEntity(
                 (String) payload.get("type"),
                 (String) payload.get("fname"));
 
@@ -106,7 +106,7 @@ public class StartupLoadFromDiskListener implements ApplicationListener<ContextR
             }
 
             // Persist entity into storage
-            repository.save(entity);
+            entityStorageMap.put(entity.getDistributedMapKey(), entity);
             log.debug("Successfully imported new entity type={} fname={}", payload.get("type"), payload.get("fname"));
         }
         catch(Exception error) {
