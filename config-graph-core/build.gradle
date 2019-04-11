@@ -25,6 +25,7 @@ dependencies {
     implementation "com.hazelcast:hazelcast:3.12"
     implementation "com.google.guava:guava:27.0.1-jre"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.8"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.8"
     implementation "io.jsonwebtoken:jjwt-api:0.10.5"
     implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"
     runtime "io.jsonwebtoken:jjwt-impl:0.10.5"
@@ -54,6 +55,7 @@ bootRun {
     main = "edu.fhda.uportal.confgraph.SpringBootRunner"
     args "--spring.config.name=localdev"
     jvmArgs "-Dportal.home=config"
+    workingDir project.rootDir
 }
 
 test {
