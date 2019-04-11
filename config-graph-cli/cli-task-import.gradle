@@ -1,0 +1,120 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.squareup.okhttp3:okhttp:3.12.1"
+        classpath "io.jsonwebtoken:jjwt-api:0.10.5"
+        classpath "io.jsonwebtoken:jjwt-impl:0.10.5"
+        classpath "io.jsonwebtoken:jjwt-jackson:0.10.5"
+    }
+}
+
+
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.security.Keys
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+
+import javax.crypto.SecretKey
+
+apply from: "cli-utilities.gradle"
+
+class ImportTask extends DefaultTask {
+    
+    File input = project.rootProject.file("./config-graph")
+    Properties portalProperties = new Properties()
+    OkHttpClient httpClient = new OkHttpClient()
+    String configGraphUrl
+    String jwtSignedKey
+
+    ImportTask() {
+        this.group = "Config Graph (Foothill-De Anza)"
+        //this.dependsOn("classes")
+    }
+
+    @Option(option = "input", description = "Set the graph file or directory of files to import")
+    void setInput(String path) {
+        this.input = project.rootProject.file(path)
+    }
+
+    @Option(option = "portal-home", description = "Set the portal home directory to local configuration from uPortal.properties")
+    void setPortalHome(String path) {
+        project.file(path).withReader { reader -> portalProperties.load(reader) }
+
+        // Unpack the config graph URL from portal properties
+        this.setConfigGraphUrl(portalProperties.getProperty("edu.fhda.confgraph.url"))
+
+        // Generate JWT key for authentication API requests
+        String jwtSignatureKey = portalProperties.getProperty("org.apereo.portal.soffit.jwt.signatureKey")
+        this.setJwtSigningKey(jwtSignatureKey)
+    }
+
+    @Option(option = "config-graph-url", description = "Set API URL endpoint for a config graph instance")
+    void setConfigGraphUrl(String url) {
+        this.configGraphUrl = url
+    }
+
+    @Option(option = "jwt-key", description = "Set secret value to use for generating JWT signed keys")
+    void setJwtSigningKey(String key) {
+        byte[] decodedKey = Base64.getDecoder().decode(key.bytes)
+        SecretKey jwtSecretKey = Keys.hmacShaKeyFor(decodedKey)
+        jwtSignedKey = Jwts
+            .builder()
+            .setSubject("admin")
+            .signWith(jwtSecretKey, SignatureAlgorithm.HS256)
+            .compact()
+    }
+
+    void importFile(File inputFile) {
+        System.out.println("Running import-directory task")
+        System.out.format("Importing file %s ... ", inputFile.toString())
+
+        try {
+            // Create HTTP request body
+            RequestBody body = project.createHttpBody(inputFile)
+
+            // Create HTTP request
+            Request request = new Request.Builder()
+                .url(configGraphUrl + "/admin/import")
+                .header("Authorization", "Bearer " + jwtSignedKey)
+                .post(body)
+                .build()
+
+            // Execute API call
+            httpClient.newCall(request).execute()
+
+            System.out.println("success")
+        }
+        catch(Exception error) {
+            System.out.println("failed")
+            throw new RuntimeException(error)
+        }
+    }
+
+    @TaskAction
+    def perform() {
+        def files = []
+
+        // Check if the input is a directory of files
+        if(input.directory) {
+            // Iterate tree
+            input.eachFileRecurse { File inputFile -> files.add(inputFile) }
+        }
+        else {
+            files.add(input)
+        }
+
+        // Filter to supported files
+        files.retainAll { File inputFile -> project.isSupportedFile(inputFile) }
+
+        // Iterate and import each file
+        files.each { File inputFile -> importFile(inputFile)}
+    }
+
+}
+
+task configGraphImport(type: ImportTask)

@@ -1,0 +1,44 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.squareup.okhttp3:okhttp:3.12.1"
+        classpath "io.jsonwebtoken:jjwt-api:0.10.5"
+        classpath "io.jsonwebtoken:jjwt-impl:0.10.5"
+        classpath "io.jsonwebtoken:jjwt-jackson:0.10.5"
+    }
+}
+
+
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import java.util.regex.Pattern
+
+Pattern regexJson = Pattern.compile("^.*[.]json", Pattern.CASE_INSENSITIVE)
+Pattern regexYaml = Pattern.compile("^.*[.](yml|yaml)", Pattern.CASE_INSENSITIVE)
+MediaType JSON = MediaType.get("application/json; charset=utf-8")
+MediaType YAML = MediaType.get("application/x-yaml")
+
+ext.createHttpBody = { File source ->
+    if(regexJson.matcher(source.name).matches()) {
+        return RequestBody.create(JSON, source.bytes)
+    }
+    else if(regexYaml.matcher(source.name).matches()) {
+        return RequestBody.create(YAML, source.bytes)
+    }
+
+    throw new RuntimeException("Source file " + source.toString() + " has an unrecognized extension");
+}
+
+ext.isSupportedFile = { File source ->
+    if(regexJson.matcher(source.name).matches()) {
+        return Boolean.TRUE
+    }
+    else if(regexYaml.matcher(source.name).matches()) {
+        return Boolean.TRUE
+    }
+
+    return Boolean.FALSE
+}

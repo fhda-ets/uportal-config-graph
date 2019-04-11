@@ -1,23 +1,17 @@
-plugins {
-    id "java"
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.squareup.okhttp3:okhttp:3.12.1"
+        classpath "io.jsonwebtoken:jjwt-api:0.10.5"
+        classpath "io.jsonwebtoken:jjwt-impl:0.10.5"
+        classpath "io.jsonwebtoken:jjwt-jackson:0.10.5"
+    }
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    jcenter()
-    mavenCentral()
-}
-
-dependencies {
-    implementation "info.picocli:picocli:3.9.1"
-    implementation "org.fusesource.jansi:jansi:1.17.1"
-    implementation "com.squareup.okhttp3:okhttp:3.12.1"
-    implementation "io.jsonwebtoken:jjwt-api:0.10.5"
-    implementation "io.jsonwebtoken:jjwt-impl:0.10.5"
-    implementation "io.jsonwebtoken:jjwt-jackson:0.10.5"
-}
+apply from: "cli-task-import.gradle"
 
 // Disable uPortal-start tasks for root project
 if(project.tasks.findByName("tomcatClean")) {
@@ -27,41 +21,3 @@ if(project.tasks.findByName("tomcatClean")) {
 if(project.tasks.findByName("tomcatDeploy")) {
     tomcatDeploy.enabled = false
 }
-
-class ImportTask extends DefaultTask {
-
-    ImportTask() {
-        this.group = "Config Graph (Foothill-De Anza)"
-        this.dependsOn("classes")
-    }
-
-    String action = "import-dir"
-    File input = project.rootProject.file("./config-graph")
-    File portalHome = project.rootProject.file(".gradle/tomcat/portal")
-
-    @Option(option = "input", description = "Set the graph file or directory of files to import")
-    void setInput(String path) {
-        this.input = project.file(path)
-        this.action = (this.input.file) ? "import-file" : "import-dir"
-    }
-
-    @Option(option = "portal-home", description = "Set the portal home directory")
-    void setPortalHome(String path) {
-        this.portalHome = project.file(path)
-    }
-
-    @TaskAction
-    def perform() {
-        project.javaexec {
-            classpath = project.convention.plugins.java.sourceSets.main.runtimeClasspath
-            main = "edu.fhda.uportal.confgraph.cli.CliRunner"
-            workingDir = project.rootProject.rootDir
-            args "--portal-home", portalHome.absolutePath
-            args action
-            args input.absolutePath
-        }
-    }
-
-}
-
-task configGraphImport(type: ImportTask)
