@@ -35,12 +35,6 @@ public abstract class AbstractExtensibleConfigEntity implements ExtensibleConfig
         this.dateUpdated = LocalDateTime.now();
     }
 
-    /**
-     * Empty constructor.
-     */
-    protected AbstractExtensibleConfigEntity() {
-    }
-
     public String getType() {
         return this.type;
     }
