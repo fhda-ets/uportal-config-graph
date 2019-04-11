@@ -42,7 +42,10 @@ public class QueryController {
 
         log.debug("Handling entity type query type={} tag_key={} tag_value={}", type, tagKey, tagValue);
 
-        return entityProvider.queryByTypeAndTag(type, tagKey + "=" + tagValue);
+        if(tagKey != null && tagValue != null) {
+            return entityProvider.queryByTypeAndTag(type, tagKey + "=" + tagValue);
+        }
+        return entityProvider.queryByType(type);
     }
 
     /**
@@ -56,7 +59,7 @@ public class QueryController {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ExtensibleConfigEntity queryByTypeAndTags(@PathVariable String type, @PathVariable String fname) {
+    public ExtensibleConfigEntity queryByTypeAndFname(@PathVariable String type, @PathVariable String fname) {
         log.debug("Handling entity type and fname query type={} fname={}", type, fname);
 
         return entityProvider.get(type, fname);
@@ -69,7 +72,7 @@ public class QueryController {
      * @return List of zero or more entity objects
      */
     @RequestMapping(
-        value="admin/query/tag/{tagkey}/{tagval}",
+        value="admin/query/tag/{tagKey}/{tagValue}",
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
