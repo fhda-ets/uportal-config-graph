@@ -1,8 +1,9 @@
 package edu.fhda.uportal.confgraph.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.core.IMap;
-import edu.fhda.uportal.confgraph.impl.hazelcast.ExtensibleHazelcastEntity;
+import edu.fhda.uportal.confgraph.api.EntityProvider;
+import edu.fhda.uportal.confgraph.api.ExtensibleConfigEntity;
+import edu.fhda.uportal.confgraph.impl.SimpleEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +23,6 @@ import java.util.Map;
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
-@SuppressWarnings("Duplicates")
 @Controller
 public class ImportController {
 
@@ -31,7 +30,7 @@ public class ImportController {
 
     @Autowired @Qualifier("jacksonJsonMapper") ObjectMapper jacksonJsonMapper;
     @Autowired @Qualifier("jacksonYamlMapper") ObjectMapper jacksonYamlMapper;
-    @Autowired IMap<String, ExtensibleHazelcastEntity> entityStorageMap;
+    @Autowired EntityProvider entityProvider;
 
     /**
      * Import an entity from a JSON document.
@@ -103,24 +102,10 @@ public class ImportController {
 
     private void mapAndSaveEntity(Map<String, Object> payload) {
         // Map into new entity
-        ExtensibleHazelcastEntity entity = new ExtensibleHazelcastEntity(
-            (String) payload.get("type"),
-            (String) payload.get("fname"));
-
-        if(payload.containsKey("acls")) {
-            entity.setAcls((Map<String, List<String>>) payload.get("acls"));
-        }
-
-        if(payload.containsKey("graph")) {
-            entity.setGraph((Map<String, Object>) payload.get("graph"));
-        }
-
-        if(payload.containsKey("tags")) {
-            entity.setTags((Map<String, String>) payload.get("tags"));
-        }
+        ExtensibleConfigEntity entity = new SimpleEntity(payload);
 
         // Persist entity into storage
-        entityStorageMap.put(entity.getDistributedMapKey(), entity);
+        entityProvider.save(entity);
         log.debug("Successfully imported new entity type={} fname={}", payload.get("type"), payload.get("fname"));
     }
 

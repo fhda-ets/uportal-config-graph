@@ -1,8 +1,8 @@
 package edu.fhda.uportal.confgraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.core.IMap;
-import edu.fhda.uportal.confgraph.impl.hazelcast.ExtensibleHazelcastEntity;
+import edu.fhda.uportal.confgraph.api.EntityProvider;
+import edu.fhda.uportal.confgraph.impl.SimpleEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +12,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -35,7 +35,7 @@ public class StartupLoadFromDiskListener implements ApplicationListener<ContextR
 
     @Autowired @Qualifier("jacksonJsonMapper") ObjectMapper jacksonJsonMapper;
     @Autowired @Qualifier("jacksonYamlMapper") ObjectMapper jacksonYamlMapper;
-    @Autowired IMap<String, ExtensibleHazelcastEntity> entityStorageMap;
+    @Autowired EntityProvider entityProvider;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -64,7 +64,7 @@ public class StartupLoadFromDiskListener implements ApplicationListener<ContextR
                 try {
                     Files.walk(inputDirectory)
                         .filter(Files::isRegularFile)
-                        .filter(StartupLoadFromDiskListener::isSupportedFile)
+                        .filter(source -> isSupportedFile(source) != null)
                         .forEach(this::performFileImport);
                 }
                 catch(Exception walkError) {
@@ -77,36 +77,26 @@ public class StartupLoadFromDiskListener implements ApplicationListener<ContextR
         try {
             // Evaluate and parse by file type
             Map<String, Object> payload = null;
-            if(regexJson.matcher(inputFile.getFileName().toString()).matches()) {
+            SupportedFileType detectedFormat = isSupportedFile(inputFile);
+            if(detectedFormat == SupportedFileType.JSON) {
                 log.debug("Parsing JSON document {}", inputFile);
                 payload = jacksonJsonMapper
                     .readValue(Files.readAllBytes(inputFile), HashMap.class);
             }
-            else if(regexYaml.matcher(inputFile.getFileName().toString()).matches()) {
+            else if(detectedFormat == SupportedFileType.YAML) {
                 log.debug("Parsing YAML document {}", inputFile);
                 payload = jacksonYamlMapper
                     .readValue(Files.readAllBytes(inputFile), HashMap.class);
             }
+            else {
+                throw new IOException(inputFile.toString() + " appears to be an unsupported file format");
+            }
 
             // Map into new entity
-            ExtensibleHazelcastEntity entity = new ExtensibleHazelcastEntity(
-                (String) payload.get("type"),
-                (String) payload.get("fname"));
-
-            if(payload.containsKey("acls")) {
-                entity.setAcls((Map<String, List<String>>) payload.get("acls"));
-            }
-
-            if(payload.containsKey("graph")) {
-                entity.setGraph((Map<String, Object>) payload.get("graph"));
-            }
-
-            if(payload.containsKey("tags")) {
-                entity.setTags((Map<String, String>) payload.get("tags"));
-            }
+            SimpleEntity entity = new SimpleEntity(payload);
 
             // Persist entity into storage
-            entityStorageMap.put(entity.getDistributedMapKey(), entity);
+            entityProvider.save(entity);
             log.debug("Successfully imported new entity type={} fname={}", payload.get("type"), payload.get("fname"));
         }
         catch(Exception error) {
@@ -114,15 +104,19 @@ public class StartupLoadFromDiskListener implements ApplicationListener<ContextR
         }
     }
 
-    static boolean isSupportedFile(Path source) {
+    static SupportedFileType isSupportedFile(Path source) {
         if(regexJson.matcher(source.getFileName().toString()).matches()) {
-            return Boolean.TRUE;
+            return SupportedFileType.JSON;
         }
         else if(regexYaml.matcher(source.getFileName().toString()).matches()) {
-            return Boolean.TRUE;
+            return SupportedFileType.YAML;
         }
 
-        return Boolean.FALSE;
+        return null;
+    }
+
+    private enum SupportedFileType {
+        JSON, YAML
     }
 
 }

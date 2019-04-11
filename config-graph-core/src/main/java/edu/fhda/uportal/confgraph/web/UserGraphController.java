@@ -1,6 +1,8 @@
 package edu.fhda.uportal.confgraph.web;
 
 import edu.fhda.uportal.confgraph.SpelServices;
+import edu.fhda.uportal.confgraph.api.EntityProvider;
+import edu.fhda.uportal.confgraph.api.ExtensibleConfigEntity;
 import edu.fhda.uportal.confgraph.util.DeepAppendableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Spring controller with routes for portal end-users to build personalized graphs from config entities. Entities
@@ -31,7 +32,7 @@ public class UserGraphController {
 
     private static final Logger log = LogManager.getLogger();
 
-    @Autowired private ExtensibleConfigRepository repository;
+    @Autowired EntityProvider entityProvider;
     @Autowired private SpelServices spelServices;
 
     private StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
@@ -50,21 +51,28 @@ public class UserGraphController {
     @ResponseBody
     public Map queryForMe(
         HttpServletRequest request,
+        @RequestParam(value = "type", required = false) String type,
         @RequestParam(value = "tagkey", required = false) String tagKey,
         @RequestParam(value = "tagval", required = false) String tagValue) {
 
         log.debug("Handling end user graph query tag_key={} tag_value={}", tagKey, tagValue);
 
         // Placeholder
-        Iterable<ExtensibleConfigJpaEntity> entities;
+        List<ExtensibleConfigEntity> entities;
 
-        if(tagKey != null && tagValue != null) {
+        // Query by tags only
+        if(tagKey != null && tagValue != null && type == null) {
             // If tags have been provided, then use them for query predicates
-            entities = repository.findByTag(tagKey, tagValue);
+            entities = entityProvider.queryByTag(tagKey + "=" + tagValue);
+        }
+        // Query by type and tags
+        else if(tagKey != null && tagValue != null && type != null) {
+            // If tags have been provided, then use them for query predicates
+            entities = entityProvider.queryByTypeAndTag(type, tagKey + "=" + tagValue);
         }
         else {
             // Query every defined entity
-            entities = repository.findAll();
+            entities = entityProvider.listAll();
         }
 
         // Create an appendable map to capture the final graph output
@@ -76,8 +84,8 @@ public class UserGraphController {
         log.debug("SpEL root object {}", rootObject);
 
         // Process entity results
-        StreamSupport
-            .stream(entities.spliterator(), false)
+        entities
+            .stream()
             .filter(new QueryEntityAclPredicate(rootObject))
             .forEach(entity -> {
                 log.trace("Merging entity approved by ACL {}", entity);
@@ -112,15 +120,15 @@ public class UserGraphController {
         log.debug("Handling end user entity inventory tag_key={} tag_value={}", tagKey, tagValue);
 
         // Placeholder
-        Iterable<ExtensibleConfigJpaEntity> entities;
+        List<ExtensibleConfigEntity> entities;
 
         if(tagKey != null && tagValue != null) {
             // If tags have been provided, then use them for query predicates
-            entities = repository.findByTypeAndTag(type, tagKey, tagValue);
+            entities = entityProvider.queryByTypeAndTag(type, tagKey, tagValue);
         }
         else {
             // Query all entities by type
-            entities = repository.findByType(type);
+            entities = entityProvider.queryByType(type);
         }
 
         // Create a root object for security expression evaluation
@@ -129,8 +137,8 @@ public class UserGraphController {
         log.debug("SpEL root object {}", rootObject);
 
         // Process entity results
-        return StreamSupport
-            .stream(entities.spliterator(), false)
+        return entities
+            .stream()
             .filter(new QueryEntityAclPredicate(rootObject))
             .map(entity -> {
                 Map inventoryObject = new HashMap();
@@ -148,7 +156,7 @@ public class UserGraphController {
      * ACL, and the expression for that ACL matches an input root object with the claims from an open ID token issued
      * by the portal.
      */
-    class QueryEntityAclPredicate implements Predicate<ExtensibleConfigJpaEntity> {
+    class QueryEntityAclPredicate implements Predicate<ExtensibleConfigEntity> {
 
         private Map rootObject;
 
@@ -157,7 +165,7 @@ public class UserGraphController {
         }
 
         @Override
-        public boolean test(ExtensibleConfigJpaEntity entity) {
+        public boolean test(ExtensibleConfigEntity entity) {
             // Check if entity has disabled tag
             if(entity.getTags().getOrDefault("graph.disabled", "false").equalsIgnoreCase("true")) {
                 return false;

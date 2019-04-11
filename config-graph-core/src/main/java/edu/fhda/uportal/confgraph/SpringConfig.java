@@ -2,12 +2,6 @@ package edu.fhda.uportal.confgraph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.hazelcast.config.ClasspathXmlConfig;
-import com.hazelcast.config.FileSystemXmlConfig;
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import edu.fhda.uportal.confgraph.impl.hazelcast.ExtensibleHazelcastEntity;
 import edu.fhda.uportal.confgraph.util.YamlPropertySourceFactory;
 import edu.fhda.uportal.confgraph.web.security.JwtAuthenticationFilter;
 import io.jsonwebtoken.JwtParser;
@@ -23,17 +17,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
 /**
  * Spring application definition.
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
  * @version 1.0
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"edu.fhda.uportal.confgraph"})
 @PropertySource(value = "file:${portal.home}/uPortal.properties", ignoreResourceNotFound = true)
-@PropertySource(value = "file:${portal.home}/config-graph.yml", ignoreResourceNotFound = true, factory = YamlPropertySourceFactory.class)
+@PropertySource(value = "file:${portal.home}/config-graph.yml", factory = YamlPropertySourceFactory.class)
 @ServletComponentScan
 public class SpringConfig {
 
@@ -65,27 +56,6 @@ public class SpringConfig {
         registrationBean.setName("endUserRoutesJwtFilter");
         registrationBean.addUrlPatterns("/graph/*");
         return registrationBean;
-    }
-
-    @Bean
-    public HazelcastInstance hazelcast() throws IOException {
-        // Load default Hazelcast configuration from classpath
-        ClasspathXmlConfig baseConfig = new ClasspathXmlConfig("hz-config-default.xml");
-
-        // Load external configuration from portal home
-        FileSystemXmlConfig externalConfig = new FileSystemXmlConfig(
-            Paths.get(System.getProperty("portal.home"), "config-graph-hz.xml").toFile());
-
-        // Apply specific sections from external config to base
-        baseConfig.setNetworkConfig(externalConfig.getNetworkConfig());
-
-        // Create Hazelcast instance
-        return Hazelcast.newHazelcastInstance(baseConfig);
-    }
-
-    @Bean
-    public IMap<String, ExtensibleHazelcastEntity> entityStorageMap(@Autowired HazelcastInstance hazelcast) {
-        return hazelcast.getMap("entities");
     }
 
     /**

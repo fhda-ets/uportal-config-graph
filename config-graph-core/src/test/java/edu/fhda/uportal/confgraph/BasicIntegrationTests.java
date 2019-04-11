@@ -1,17 +1,15 @@
 package edu.fhda.uportal.confgraph;
 
-import com.hazelcast.core.IMap;
-import com.hazelcast.query.EntryObject;
-import com.hazelcast.query.Predicate;
-import com.hazelcast.query.PredicateBuilder;
-import edu.fhda.uportal.confgraph.impl.hazelcast.ExtensibleHazelcastEntity;
+import edu.fhda.uportal.confgraph.api.EntityProvider;
+import edu.fhda.uportal.confgraph.api.ExtensibleConfigEntity;
+import edu.fhda.uportal.confgraph.impl.SimpleEntity;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author mrapczynski, Foothill-De Anza College District, rapczynskimatthew@fhda.edu
@@ -21,15 +19,15 @@ import java.util.Collection;
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BasicIntegrationTests {
-
-    @Autowired IMap<String, ExtensibleHazelcastEntity> entityStorageMap;
+    
+    @Autowired EntityProvider entityProvider;
 
     @Test
     @DisplayName("Create a new config entity")
     @Order(1)
     void createNewEntity() {
         // Create a new entity
-        ExtensibleHazelcastEntity entity = new ExtensibleHazelcastEntity("content", "student");
+        ExtensibleConfigEntity entity = new SimpleEntity("content", "student2");
 
         // Set some stuff on the graph
         entity.getGraph().put("attribute1", "helloworld");
@@ -39,59 +37,65 @@ public class BasicIntegrationTests {
         entity.getTags().put("campus", "foothill");
 
         // Save it
-        entityStorageMap.put(entity.getDistributedMapKey(), entity);
+        entityProvider.save(entity);
     }
 
-    @Test
+    @RepeatedTest(5)
     @DisplayName("Query entity by tags")
     @Order(2)
-    @RepeatedTest(5)
     void queryEntityByTags() {
-        // Build query
-        EntryObject entry = new PredicateBuilder().getEntryObject();
-        Predicate predicate = entry.get("tags").equal("campus=foothill");
-
-        // Execute query
-        Collection<ExtensibleHazelcastEntity> results = entityStorageMap.values(predicate);
-        assert results.size() > 1;
+        List<ExtensibleConfigEntity> entities = entityProvider.queryByTag("campus=foothill");
+        assert entities.size() > 1;
     }
 
-    @Test
-    @DisplayName("Query entity by type and fname")
-    @Order(3)
     @RepeatedTest(5)
-    void queryEntityByTypeAndFname() {
-        // Build query
-        EntryObject entry = new PredicateBuilder().getEntryObject();
-        Predicate predicate = entry
-            .get("type").equal("content")
-            .and(entry.get("fname").equal("student"));
+    @DisplayName("Query entity by multiple tags")
+    @Order(3)
+    void queryEntityByMultipleTags() {
+        List<ExtensibleConfigEntity> entities = entityProvider.queryByTag(
+            "audience=Faculty", "application=Starfish");
+        assert entities.size() == 1;
+    }
 
-        // Execute query
-        Collection<ExtensibleHazelcastEntity> results = entityStorageMap.values(predicate);
-        assert results.size() == 1;
+    @RepeatedTest(5)
+    @DisplayName("Query entity by type")
+    @Order(4)
+    void queryEntityByType() {
+        List<ExtensibleConfigEntity> entities = entityProvider.queryByType("content");
+        assert entities.size() > 1;
+    }
+
+    @RepeatedTest(5)
+    @DisplayName("Query entity by type and tags")
+    @Order(5)
+    void queryEntityByTypeAndTags() {
+        List<ExtensibleConfigEntity> entities = entityProvider.queryByTypeAndTag(
+            "content",
+            "campus=foothill");
+        assert entities.size() > 1;
+    }
+
+    @RepeatedTest(5)
+    @DisplayName("Get entity by type and fname")
+    @Order(6)
+    void getEntity() {
+        ExtensibleConfigEntity entity = entityProvider.get("content", "student2");
+        assert entity != null;
     }
 
     @Test
     @DisplayName("Delete entity by type and fname")
-    @Order(4)
+    @Order(7)
     void removeEntity() {
-        entityStorageMap.delete("content:student");
+        entityProvider.delete("content", "student2");
     }
 
     @Test
     @DisplayName("Verify entity was deleted")
-    @Order(5)
+    @Order(8)
     void verifyDeletedEntity() {
-        // Build query
-        EntryObject entry = new PredicateBuilder().getEntryObject();
-        Predicate predicate = entry
-            .get("type").equal("content")
-            .and(entry.get("fname").equal("student"));
-
-        // Execute query
-        Collection<ExtensibleHazelcastEntity> results = entityStorageMap.values(predicate);
-        assert results.size() == 0;
+        ExtensibleConfigEntity entity = entityProvider.get("content", "student2");
+        assert entity == null;
     }
 
 }

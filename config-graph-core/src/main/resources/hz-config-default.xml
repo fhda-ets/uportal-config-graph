@@ -14,7 +14,8 @@
         </attributes>
 
         <indexes>
-            <index>type, fname</index>
+            <!-- Single attribute indexes -->
+            <index>type</index>
             <index>tags</index>
         </indexes>
     </map>
