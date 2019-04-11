@@ -1,5 +1,6 @@
 package edu.fhda.uportal.confgraph.api;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
@@ -60,10 +61,12 @@ public abstract class AbstractExtensibleConfigEntity implements ExtensibleConfig
         return this.acls;
     }
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss a")
     public LocalDateTime getDateCreated() {
         return this.dateCreated;
     }
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss a")
     public LocalDateTime getDateUpdated() {
         return this.dateUpdated;
     }
